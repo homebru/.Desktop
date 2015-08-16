@@ -33,6 +33,6 @@ Saves will overwrite any previously existing file of the same name that is in th
 
 Once you save an edited .desktop file, manually move/copy the file from the application's "output" folder to the appropriate directory in your Ubuntu installation, typically `/usr/share/applications`.
  
-![Desktop File Utility.png]()
+![Desktop File Utility.png](https://bitbucket.org/repo/k6RMo6/images/585795466-Desktop%20File%20Utility.png)
 
 ## Enjoy! ##
