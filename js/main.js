@@ -3,11 +3,20 @@
  */
 
 var newFileName = '';
+var quoteHover = false;
 
 $(function() {
 	$("#file-list").select2({
 		placeholder: "Select a file . . .",
 		allowClear: true
+	});
+
+	$('blockquote').mouseenter(function() {
+		quoteHover = true;
+	});
+
+	$('blockquote').mouseleave(function() {
+		quoteHover = false;
 	});
 
 	/* Bluezed Scroll to Top credit goes to https://github.com/bluezed/yii2-scroll-top */
@@ -60,12 +69,9 @@ $('#file-list').on("select2:select", function (e) {
 	$.ajax({
 		method:'POST',
 		url:'index.php',
-		//dataType: 'JSON',
 		data: {file: $('#file-list').select2('val')}
 	})
 		.done(function(data) {
-			//var stuff = JSON.parse(data);
-			//alert(stuff);
 			$('#guts').html(data);
 			setWidths();
 			bindIt();
@@ -100,6 +106,7 @@ $('body').on('click', '.btn-addnew', function() {
 	j.append('<div class="input-group">' +
 		'<span class="input-group-addon right-text" id="basic-addon' + x + '" style="background-color:'+ theOrange + ';">Enter a name . . .</span>' +
 		'<input type="text" class="form-control" placeholder="Enter a value . . ." aria-describedby="basic-addon' + x + '" name="v' + x +'_name" style="border-color:'+ theOrange + ';">' +
+		'<span class="input-group-addon trash fa fa-trash hand" aria-label="Delete Item" title="Delete Item"></span>' +
 		'</div>');
 	var k = j.find('.input-group').last();
 	k.find('span').width(n);
@@ -107,6 +114,15 @@ $('body').on('click', '.btn-addnew', function() {
 	swal({
 		type: 'success',
 		html: '<p>A new item has been added.'
+	});
+	$('#save').show();
+});
+$('body').on('click', '.btn-comment', function() {
+	var j = $(this).parent().parent().next();
+	j.append('<blockquote class="blockquote-reverse"><p># New Comment<span class="trash fa fa-trash hand" aria-label="Delete Item" title="Delete Item"></span></p><input type="hidden" name="#{$id}_#comment" value="# New Comment"></blockquote>');
+	swal({
+		type: 'success',
+		html: '<p>A new comment has been added.'
 	});
 	$('#save').show();
 });
@@ -119,7 +135,7 @@ $('#new-section').on('click', function(){
 		'<h4>New Section</h4><input type="hidden" name="s' + x + '_[New Section]" value="[New Section]">' +
 		'</div>' +
 		'<div class="col-md-1">' +
-		'<button type="button" class="btn btn-addnew" aria-label="Add New Item"><span class="glyphicon glyphicon-plus"></span></button>' +
+		'<button type="button" class="btn btn-addnew" aria-label="Add New Item"><span class="fa fa-plus"></span></button>' +
 		'</div>' +
 		'</div>' +
 		'<div class="panel-body">');
@@ -153,7 +169,7 @@ $('body').on('click', 'blockquote', function(){
 		$('#save').show();
 	});
 });
-$('body').on('click', 'h4, .input-group-addon', function(){
+$('body').on('click', 'h4, .input-group-addon .right-text', function(){
 	var $that = $(this);
 	swal({
 		title: "Edit " + $(this).prop('title'),
@@ -181,13 +197,24 @@ $('body').on('click', 'h4, .input-group-addon', function(){
 		$('#save').show();
 	});
 });
+$('body').on('click', '.btn-delete, .input-group-addon .trash, blockquote .trash', function(e) {
+	if($(this).hasClass('btn-delete'))
+		$(this).parent().parent().parent().remove();
+	else
+		$(this).parent().remove();
+
+	e.preventDefault();
+	e.stopPropagation();
+});
 function setWidths() {
 	var _width = 0;
 	$('.input-group-addon').each(function (index) {
 		_width = ($(this).width() > _width ? $(this).width() : _width);
 	});
-	$('.input-group-addon').each(function (index) {
+	$('.input-group-addon.right-text').each(function (index) {
 		$(this).width(_width);
+		var $next = $(this).next();
+		$next.width($next.width() - 40);
 	});
 }
 function bindIt() {
